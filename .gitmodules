@@ -1,0 +1,3 @@
+[submodule "deepiris"]
+    path = deepiris
+    url = git@github.com:Analyzable-FR/DeepIris.git
