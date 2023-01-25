@@ -26,7 +26,7 @@ SOFTWARE.
 import os
 import sys
 
-from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtGui import QIcon, QPixmap, QAction
 from PySide6.QtWidgets import QFileDialog, QApplication, QMainWindow, QSplashScreen
 from PySide6.QtCore import QFile, QTimer, Qt
 from window import Window
@@ -40,6 +40,10 @@ class MainWindow(QMainWindow):
         self.ui.actionOpen.triggered.connect(self.openImage)
         self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionExport.triggered.connect(self.export)
+
+        processAction = QAction("Process", self)
+        processAction.triggered.connect(self.process)
+        self.ui.toolBar.addAction(processAction)
 
     def loadUi(self):
         self.ui = Ui_MainWindow()
@@ -55,6 +59,10 @@ class MainWindow(QMainWindow):
         window = Window(path)
         self.ui.mdiArea.addSubWindow(window)
         window.show()
+
+    def process(self):
+        if (subWindow := self.ui.mdiArea.activeSubWindow()) is not None:
+            subWindow.processImage()
 
     def export(self):
         if (subWindow := self.ui.mdiArea.activeSubWindow()) is not None:

@@ -38,6 +38,7 @@ class ImageViewer(QGraphicsView):
 
         self.setMouseTracking(False)
         # self.setViewport(QOpenGLWidget())
+        self.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         self.setAcceptDrops(True)
 
         self.undoAction = QAction(self, self.tr("Undo"))
@@ -84,6 +85,8 @@ class ImageViewer(QGraphicsView):
             self.pixmap.convertFromImage(QImage(
                 array.data, array.shape[1], array.shape[0], array.strides[0], QImage.Format_RGBA8888))
         self.image.setPixmap(self.pixmap)
+        self.setSceneRect(self.image.sceneBoundingRect())
+        self.centerOn(self.scene.width()//2, self.scene.height()//2)
 
     def wheelEvent(self, event):
         '''

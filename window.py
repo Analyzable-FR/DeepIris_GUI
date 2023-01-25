@@ -28,6 +28,8 @@ from PySide6.QtCore import QStandardPaths, QDir, QEvent, Signal, Slot, Qt, QPoin
 from PySide6.QtGui import QImage, QPixmap, QFont, QPainter, QPen, QCursor, QKeySequence, QAction, QActionGroup
 import cv2
 import os
+import numpy as np
+from deepiris.predict import QDetector
 
 from imageviewer import ImageViewer
 
@@ -42,18 +44,40 @@ class Window(QMdiSubWindow):
         self.imageViewer = ImageViewer(parent=self)
         self.imageViewer.isDrawable = False
         self.setWidget(self.imageViewer)
+        self.detector = QDetector(self)
+        self.detector.imageChanged.connect(self.updateImage)
         self.readImage()
 
     def readImage(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             self.image = cv2.imread(self.path, -1)
             self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGBA)
-            self.imageViewer.setImage(self.image, init=True)
-        except:
-            pass
+            self.imageViewer.setImage(self.image)
+            self.detector.setImage(self.image)
+        except Exception as e:
+            print(e)
+        finally:
+            QApplication.restoreOverrideCursor()
 
     def exportImage(self, filename):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             cv2.imwrite(filename, self.image)
-        except:
-            pass
+        except Exception as e:
+            print(e)
+        finally:
+            QApplication.restoreOverrideCursor()
+
+    def updateImage(self, image):
+        self.image = np.copy(image)
+        self.imageViewer.setImage(self.image)
+
+    def processImage(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            self.detector.process()
+        except Exception as e:
+            print(e)
+        finally:
+            QApplication.restoreOverrideCursor()
