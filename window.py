@@ -36,6 +36,9 @@ from imageviewer import ImageViewer
 
 class Window(QMdiSubWindow):
 
+    statusChanged = Signal(str)
+    progressChanged = Signal(bool)
+
     def __init__(self, path, parent=None):
         super().__init__(parent=parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -44,8 +47,9 @@ class Window(QMdiSubWindow):
         self.imageViewer = ImageViewer(parent=self)
         self.imageViewer.isDrawable = False
         self.setWidget(self.imageViewer)
-        self.detector = QDetector(self)
+        self.detector = QDetector()  # no parent to be moved on a QThread
         self.detector.imageChanged.connect(self.updateImage)
+        self.detector.statusChanged.connect(self.statusChanged)
         self.readImage()
 
     def readImage(self):
@@ -74,10 +78,16 @@ class Window(QMdiSubWindow):
         self.imageViewer.setImage(self.image)
 
     def processImage(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            self.detector.process()
+            self.processingThread = QThread(self)
+            self.detector.moveToThread(self.processingThread)
+            self.processingThread.started.connect(self.detector.process)
+            self.detector.finished.connect(self.processingThread.quit)
+            self.detector.finished.connect(
+                lambda: self.progressChanged.emit(False))
+            self.processingThread.finished.connect(
+                self.processingThread.deleteLater)
+            self.progressChanged.emit(True)
+            self.processingThread.start()
         except Exception as e:
             print(e)
-        finally:
-            QApplication.restoreOverrideCursor()

@@ -27,7 +27,7 @@ import os
 import sys
 
 from PySide6.QtGui import QIcon, QPixmap, QAction
-from PySide6.QtWidgets import QFileDialog, QApplication, QMainWindow, QSplashScreen
+from PySide6.QtWidgets import QProgressBar, QFileDialog, QApplication, QMainWindow, QSplashScreen
 from PySide6.QtCore import QFile, QTimer, Qt
 from window import Window
 from ui_mainwindow import Ui_MainWindow
@@ -41,9 +41,18 @@ class MainWindow(QMainWindow):
         self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionExport.triggered.connect(self.export)
 
-        processAction = QAction("Process", self)
+        processAction = QAction(QIcon(":/process.png"),
+                                self.tr("Trigerred processing"), self)
         processAction.triggered.connect(self.process)
         self.ui.toolBar.addAction(processAction)
+
+        self.progressBar = QProgressBar(self)
+        self.ui.statusbar.addPermanentWidget(self.progressBar)
+        self.progressBar.setVisible(False)
+        self.progressBar.setMaximum(0)
+
+    def showProgress(self, isVisible):
+        self.progressBar.setVisible(isVisible)
 
     def loadUi(self):
         self.ui = Ui_MainWindow()
@@ -57,6 +66,8 @@ class MainWindow(QMainWindow):
 
     def newWindow(self, path):
         window = Window(path)
+        window.statusChanged.connect(self.ui.statusbar.showMessage)
+        window.progressChanged.connect(self.showProgress)
         self.ui.mdiArea.addSubWindow(window)
         window.show()
 

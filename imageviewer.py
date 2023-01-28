@@ -24,7 +24,7 @@ SOFTWARE.
 
 
 from PySide6.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsPixmapItem, QApplication, QWidget, QScrollArea, QLabel
-from PySide6.QtCore import QEvent, Signal, Slot, Qt, QPoint
+from PySide6.QtCore import QEvent, Signal, Slot, Qt, QPoint, QTimer
 from PySide6.QtGui import QUndoStack, QImage, QPixmap, QFont, QPainter, QPen, QCursor, QKeySequence, QAction
 import numpy as np
 import cv2
@@ -85,7 +85,8 @@ class ImageViewer(QGraphicsView):
             self.pixmap.convertFromImage(QImage(
                 array.data, array.shape[1], array.shape[0], array.strides[0], QImage.Format_RGBA8888))
         self.image.setPixmap(self.pixmap)
-        self.setSceneRect(self.image.sceneBoundingRect())
+        QTimer.singleShot(200, lambda: self.setSceneRect(
+            self.image.sceneBoundingRect()))
         self.centerOn(self.scene.width()//2, self.scene.height()//2)
 
     def wheelEvent(self, event):
