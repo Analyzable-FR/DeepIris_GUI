@@ -74,7 +74,10 @@ class Window(QMdiSubWindow):
     def exportImage(self, filename):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            cv2.imwrite(filename, self.image)
+            self.image = cv2.cvtColor(self.image, cv2.COLOR_RGBA2BGR)
+            image = cv2.putText(img=self.image, text="DEEPIRIS DEMO VERSION", org=(
+                self.image.shape[1]//17, self.image.shape[0]//2), fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=self.image.shape[1]*2e-3, color=(255, 255, 255), thickness=int(self.image.shape[1]*2e-3))
+            cv2.imwrite(filename, image)
         except Exception as e:
             print(e)
         finally:
