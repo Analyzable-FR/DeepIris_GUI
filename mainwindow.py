@@ -26,8 +26,8 @@ SOFTWARE.
 import os
 import sys
 
-from PySide6.QtGui import QIcon, QPixmap, QAction
-from PySide6.QtWidgets import QProgressBar, QFileDialog, QApplication, QMainWindow, QSplashScreen
+from PySide6.QtGui import QActionGroup, QIcon, QPixmap, QAction, QKeySequence
+from PySide6.QtWidgets import QMdiArea, QMenu, QMessageBox, QProgressBar, QFileDialog, QApplication, QMainWindow, QSplashScreen
 from PySide6.QtCore import QFile, QTimer, Qt
 from window import Window
 from ui_mainwindow import Ui_MainWindow
@@ -41,10 +41,54 @@ class MainWindow(QMainWindow):
         self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionExport.triggered.connect(self.export)
 
-        processAction = QAction(QIcon(":/process.png"),
-                                self.tr("Process"), self)
+        processAction = QAction(QIcon(":/crop.png"),
+                                self.tr("Crop iris and reduce pupil"), self)
         processAction.triggered.connect(self.process)
         self.ui.toolBar.addAction(processAction)
+
+        centerAction = QAction(QIcon(":/center.png"),
+                                self.tr("Center pupil"), self)
+        centerAction.setEnabled(False)
+        self.ui.toolBar.addAction(centerAction)
+
+        settingsAction = QAction(QIcon(":/settings.png"),
+                                self.tr("Settings"), self)
+        settingsAction.setEnabled(False)
+        self.ui.toolBar.addAction(settingsAction)
+
+        viewMenu = QMenu(self.tr("View Mode"), self)
+        self.ui.menuView.addMenu(viewMenu)
+        viewMode = QActionGroup(self)
+        stackView = QAction(self.tr("&Tabbed"), self)
+        stackView.setCheckable(True)
+        stackView.toggled.connect(
+            lambda i: self.ui.mdiArea.setViewMode(QMdiArea.TabbedView))
+        viewMode.addAction(stackView)
+        viewMenu.addAction(stackView)
+        winView = QAction(self.tr("&Windowed"), self)
+        winView.setCheckable(True)
+        winView.toggled.connect(
+            lambda i: self.ui.mdiArea.setViewMode(QMdiArea.SubWindowView))
+        viewMode.addAction(winView)
+        viewMenu.addAction(winView)
+        stackView.setChecked(True)
+
+        winMenu = QMenu(self.tr("Windows reordering"), self)
+        self.ui.menuView.addMenu(winMenu)
+        cascadeView = QAction(self.tr("&Cascaded"), self)
+        cascadeView.setShortcut(QKeySequence("Ctrl+X"))
+        cascadeView.triggered.connect(self.ui.mdiArea.cascadeSubWindows)
+        winView.toggled.connect(winMenu.setEnabled)
+        winMenu.addAction(cascadeView)
+        tileView = QAction(self.tr("&Tiled"), self)
+        tileView.triggered.connect(self.ui.mdiArea.tileSubWindows)
+        tileView.setShortcut(QKeySequence("Ctrl+B"))
+        winView.toggled.connect(winMenu.setEnabled)
+        winMenu.addAction(tileView)
+        winMenu.setEnabled(False)
+
+        self.ui.actionAboutQt.triggered.connect(qApp.aboutQt)
+        self.ui.actionAboutMe.triggered.connect(self.about)
 
         self.progressBar = QProgressBar(self)
         self.ui.statusbar.addPermanentWidget(self.progressBar)
@@ -91,6 +135,14 @@ class MainWindow(QMainWindow):
 
     def dragEnterEvent(self, event):
         event.acceptProposedAction()
+
+    def about(self):
+        messageBox = QMessageBox(self)
+        messageBox.setWindowTitle(self.tr("About"))
+        messageBox.setText(self.tr(
+            "DeepIris is designed by <a href='https://gallois.cc'>Analyzable</a>. Custom computer vision solution powered by open-source technologies."))
+        messageBox.setIconPixmap(QPixmap(":/analyzable.png"))
+        messageBox.exec()
 
 
 if __name__ == "__main__":
