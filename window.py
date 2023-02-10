@@ -28,6 +28,7 @@ from PySide6.QtCore import QStandardPaths, QDir, QEvent, Signal, Slot, Qt, QPoin
 from PySide6.QtGui import QImage, QPixmap, QFont, QPainter, QPen, QCursor, QKeySequence, QAction, QActionGroup
 import cv2
 import os
+import rawpy
 import numpy as np
 from deepiris.predict import QDetector
 
@@ -55,8 +56,14 @@ class Window(QMdiSubWindow):
     def readImage(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            self.image = cv2.imread(self.path, -1)
-            self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGBA)
+            if os.path.splitext(self.path)[1] in [".NEF", ".RAW"]:
+                with rawpy.imread(self.path) as raw:
+                    self.image = raw.postprocess(output_bps=16, use_camera_wb=True,
+                                                 use_auto_wb=False, output_color=rawpy.ColorSpace.Adobe)
+                    self.image = cv2.cvtColor(self.image, cv2.COLOR_RGB2RGBA)
+            else:
+                self.image = cv2.imread(self.path, -1)
+                self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGBA)
             self.imageViewer.setImage(self.image)
             self.detector.setImage(self.image)
         except Exception as e:

@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         self.ui.actionExport.triggered.connect(self.export)
 
         processAction = QAction(QIcon(":/process.png"),
-                                self.tr("Trigerred processing"), self)
+                                self.tr("Process"), self)
         processAction.triggered.connect(self.process)
         self.ui.toolBar.addAction(processAction)
 
