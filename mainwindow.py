@@ -26,7 +26,7 @@ SOFTWARE.
 import os
 import sys
 
-from PySide6.QtGui import QActionGroup, QIcon, QPixmap, QAction, QKeySequence
+from PySide6.QtGui import QBrush, QActionGroup, QIcon, QPixmap, QAction, QKeySequence
 from PySide6.QtWidgets import QMdiArea, QMenu, QMessageBox, QProgressBar, QFileDialog, QApplication, QMainWindow, QSplashScreen
 from PySide6.QtCore import QFile, QTimer, Qt
 from window import Window
@@ -41,18 +41,20 @@ class MainWindow(QMainWindow):
         self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionExport.triggered.connect(self.export)
 
+        self.ui.mdiArea.setBackground(QBrush(QPixmap(":/demo.png")))
+
         processAction = QAction(QIcon(":/crop.png"),
                                 self.tr("Crop iris and reduce pupil"), self)
         processAction.triggered.connect(self.process)
         self.ui.toolBar.addAction(processAction)
 
         centerAction = QAction(QIcon(":/center.png"),
-                                self.tr("Center pupil"), self)
+                               self.tr("Center pupil"), self)
         centerAction.setEnabled(False)
         self.ui.toolBar.addAction(centerAction)
 
         settingsAction = QAction(QIcon(":/settings.png"),
-                                self.tr("Settings"), self)
+                                 self.tr("Settings"), self)
         settingsAction.setEnabled(False)
         self.ui.toolBar.addAction(settingsAction)
 
@@ -104,7 +106,7 @@ class MainWindow(QMainWindow):
 
     def openImage(self):
         filename, __ = QFileDialog.getOpenFileName(self, self.tr(
-            "Open Image"), "/home/Pictures", self.tr(""))
+            "Open Image"), "/home/Pictures", self.tr("Images RAW or Raster ()"))
         if filename:
             self.newWindow(filename)
 

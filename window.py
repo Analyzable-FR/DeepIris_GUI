@@ -56,16 +56,20 @@ class Window(QMdiSubWindow):
     def readImage(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            if os.path.splitext(self.path)[1] in [".NEF", ".RAW"]:
-                with rawpy.imread(self.path) as raw:
-                    self.image = raw.postprocess(output_bps=16, use_camera_wb=True,
-                                                 use_auto_wb=False, output_color=rawpy.ColorSpace.Adobe)
-                    self.image = cv2.cvtColor(self.image, cv2.COLOR_RGB2RGBA)
-            else:
+            with rawpy.imread(self.path) as raw:
+                self.image = raw.postprocess(output_bps=16, use_camera_wb=True,
+                                             use_auto_wb=False, output_color=rawpy.ColorSpace.Adobe)
+                self.image = cv2.cvtColor(self.image, cv2.COLOR_RGB2RGBA)
+                self.imageViewer.setImage(self.image)
+                self.detector.setImage(self.image)
+        except rawpy.LibRawFileUnsupportedError:
+            try:
                 self.image = cv2.imread(self.path, -1)
                 self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGBA)
-            self.imageViewer.setImage(self.image)
-            self.detector.setImage(self.image)
+                self.imageViewer.setImage(self.image)
+                self.detector.setImage(self.image)
+            except Exception as e:
+                print(e)
         except Exception as e:
             print(e)
         finally:
