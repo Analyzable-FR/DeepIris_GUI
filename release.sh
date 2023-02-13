@@ -1,0 +1,5 @@
+python -m nuitka mainwindow.py --standalone --plugin-enable="pyside6,torch,numpy" --include-qt-plugins=sensible --assume-yes-for-downloads --report=on --disable-console --linux-icon=assets/logo.png --company-name=Analyzable --product-name=DeepIris --product-version=0.0.0 --include-module="yaml,seaborn" --include-module=torch.utils.mobile_optimizer --onefile
+
+python -m nuitka mainwindow.py --standalone --plugin-enable="pyside6,torch,numpy" --include-qt-plugins=sensible --assume-yes-for-downloads --report=on --disable-console --windows-icon-from-ico=assets/logo.ico --company-name=Analyzable --product-name=DeepIris --product-version=0.0.0 --include-module="yaml,seaborn" --include-module=torch.utils.mobile_optimizer --onefile
+
+python -m nuitka mainwindow.py --standalone --plugin-enable="pyside6,torch,numpy" --include-qt-plugins=sensible --assume-yes-for-downloads --report=on --disable-console --macos-create-app-bundle --macos-app-icon=assets/icon.icns --company-name=Analyzable --product-name=DeepIris --product-version=0.0.0 --include-module="yaml,seaborn" --include-module=torch.utils.mobile_optimizer --onefile
