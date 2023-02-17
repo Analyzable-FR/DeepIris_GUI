@@ -30,7 +30,7 @@ import cv2
 import os
 import rawpy
 import numpy as np
-from deepiris.predict import QDetector
+from deepiris import QDetector
 
 from imageviewer import ImageViewer
 

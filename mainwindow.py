@@ -37,6 +37,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.loadUi()
+        self.setWindowTitle("DeepIris Demo")
         self.ui.actionOpen.triggered.connect(self.openImage)
         self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionExport.triggered.connect(self.export)
